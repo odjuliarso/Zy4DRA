@@ -4,15 +4,18 @@ package com.zybooks.diceroller;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RollLengthDialogFragment.OnRollLengthSelectedListener {
 
     public static final int MAX_DICE = 3;
 
@@ -22,6 +25,10 @@ public class MainActivity extends AppCompatActivity {
     private ImageView[] mDiceImageViews;
     private Menu mMenu;
     private CountDownTimer mTimer;
+    private long mTimerLength = 2000;
+    private int mCurrentDie;
+    private int mInitX;
+    private int mInitY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +47,46 @@ public class MainActivity extends AppCompatActivity {
         mDiceImageViews[1] = findViewById(R.id.dice2);
         mDiceImageViews[2] = findViewById(R.id.dice3);
 
+        // The first ImageView is registered for the context menu by calling registerForContextMenu().
+        registerForContextMenu(mDiceImageViews[0]);
+
         // All dice are initially visible
         mVisibleDice = MAX_DICE;
 
+        // Register context menus for all dice and tag each die
+        for (int i = 0; i < mDiceImageViews.length; i++) {
+            registerForContextMenu(mDiceImageViews[i]);
+            mDiceImageViews[i].setTag(i);
+        }
+
+        // Moving finger left or right changes dice number
+        mDiceImageViews[0].setOnTouchListener((v, event) -> {
+            int action = event.getAction();
+            switch (action) {
+                case MotionEvent.ACTION_DOWN:
+                    mInitX = (int) event.getX();
+                    mInitY = (int) event.getY();
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    int x = (int) event.getX();
+                    int y = (int) event.getY();
+                    // See if movement is at least 20 pixels
+                    if ( (Math.abs(x - mInitX) >= 20) || (Math.abs(mInitY - y) >= 20 ) ) {
+                        if (x > mInitX || y < mInitY) {
+                            mDice[0].addOne();
+                        }
+                        else {
+                            mDice[0].subtractOne();
+                        }
+                        showDice();
+                        mInitX = x;
+                        mInitY = y;
+                    }
+
+                    return true;
+            }
+            return false;
+        });
         showDice();
     }
 
@@ -60,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
             mDiceImageViews[i].setImageDrawable(diceDrawable);
             mDiceImageViews[i].setContentDescription(Integer.toString(mDice[i].getNumber()));
         }
+    }
+    @Override
+    public void onRollLengthClick(int which) {
+        // Convert to milliseconds
+        mTimerLength = 1000 * (which + 1);
     }
 
     @Override
@@ -90,6 +139,11 @@ public class MainActivity extends AppCompatActivity {
             rollDice();
             return true;
         }
+        else if (item.getItemId() == R.id.action_roll_length) {
+            RollLengthDialogFragment dialog = new RollLengthDialogFragment();
+            dialog.show(getSupportFragmentManager(), "rollLengthDialog");
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -101,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
             mTimer.cancel();
         }
 
-        mTimer = new CountDownTimer(2000, 100) {
+        mTimer = new CountDownTimer(mTimerLength, 100) {
             public void onTick(long millisUntilFinished) {
                 for (int i = 0; i < mVisibleDice; i++) {
                     mDice[i].roll();
@@ -128,4 +182,34 @@ public class MainActivity extends AppCompatActivity {
             mDiceImageViews[i].setVisibility(View.GONE);
         }
     }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+
+        super.onCreateContextMenu(menu, v, menuInfo);
+        mCurrentDie = (int) v.getTag();   // Which die is selected?
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.context_menu, menu);
+    }
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.add_one) {
+            mDice[mCurrentDie].addOne();
+            showDice();
+            return true;
+        }
+        else if (item.getItemId() == R.id.subtract_one) {
+            mDice[mCurrentDie].subtractOne();
+            showDice();
+            return true;
+        }
+        else if (item.getItemId() == R.id.roll) {
+            rollDice();
+            return true;
+        }
+
+        return super.onContextItemSelected(item);
+    }
+
 }
