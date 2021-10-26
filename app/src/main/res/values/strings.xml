@@ -1,3 +1,4 @@
+<!--The VIEW-->
 <resources>
     <string name="app_name">Dice Roller</string>
     <string name="action_roll">Roll</string>

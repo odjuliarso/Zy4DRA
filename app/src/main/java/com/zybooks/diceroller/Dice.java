@@ -1,5 +1,5 @@
 package com.zybooks.diceroller;
-
+// The MODEL
 import java.util.Random;
 
 public class Dice {
