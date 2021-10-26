@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.ContextMenu;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GestureDetectorCompat;
 
 public class MainActivity extends AppCompatActivity implements RollLengthDialogFragment.OnRollLengthSelectedListener {
 
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements RollLengthDialogF
     private int mCurrentDie;
     private int mInitX;
     private int mInitY;
+    private GestureDetectorCompat mDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements RollLengthDialogF
         mDiceImageViews[1] = findViewById(R.id.dice2);
         mDiceImageViews[2] = findViewById(R.id.dice3);
 
+        mDetector = new GestureDetectorCompat(this, new DiceGestureListener());
+
         // The first ImageView is registered for the context menu by calling registerForContextMenu().
         registerForContextMenu(mDiceImageViews[0]);
 
@@ -54,10 +59,10 @@ public class MainActivity extends AppCompatActivity implements RollLengthDialogF
         mVisibleDice = MAX_DICE;
 
         // Register context menus for all dice and tag each die
-        for (int i = 0; i < mDiceImageViews.length; i++) {
-            registerForContextMenu(mDiceImageViews[i]);
-            mDiceImageViews[i].setTag(i);
-        }
+//        for (int i = 0; i < mDiceImageViews.length; i++) {
+//            registerForContextMenu(mDiceImageViews[i]);
+//            mDiceImageViews[i].setTag(i);
+//        }
 
         // Moving finger left or right changes dice number
         mDiceImageViews[0].setOnTouchListener((v, event) -> {
@@ -89,6 +94,26 @@ public class MainActivity extends AppCompatActivity implements RollLengthDialogF
         });
         showDice();
     }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        mDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    private class DiceGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            return true;
+        }
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            rollDice();
+            return true;
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
