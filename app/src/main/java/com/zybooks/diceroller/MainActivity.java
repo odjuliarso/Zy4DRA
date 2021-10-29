@@ -53,17 +53,18 @@ public class MainActivity extends AppCompatActivity implements RollLengthDialogF
         mDetector = new GestureDetectorCompat(this, new DiceGestureListener());
 
         // The first ImageView is registered for the context menu by calling registerForContextMenu().
-        registerForContextMenu(mDiceImageViews[0]);
+        // registerForContextMenu(mDiceImageViews[0]);    // this call activates context menu on each die, but will disable roll dice onFling
 
         // All dice are initially visible
         mVisibleDice = MAX_DICE;
 
         // Register context menus for all dice and tag each die
-//        for (int i = 0; i < mDiceImageViews.length; i++) {
-//            registerForContextMenu(mDiceImageViews[i]);
-//            mDiceImageViews[i].setTag(i);
-//        }
+        for (int i = 0; i < mDiceImageViews.length; i++) {
+            //  registerForContextMenu(mDiceImageViews[i]);  // this call activates context menu on each die, but will disable roll dice onFling
+            mDiceImageViews[i].setTag(i);
+        }
 
+        // A View object may listen for touch events by implementing a callback for the View.OnTouchListener interface.
         // Moving finger left or right changes dice number
         mDiceImageViews[0].setOnTouchListener((v, event) -> {
             int action = event.getAction();
@@ -75,8 +76,8 @@ public class MainActivity extends AppCompatActivity implements RollLengthDialogF
                 case MotionEvent.ACTION_MOVE:
                     int x = (int) event.getX();
                     int y = (int) event.getY();
-                    // See if movement is at least 20 pixels
-                    if ( (Math.abs(x - mInitX) >= 20) || (Math.abs(mInitY - y) >= 20 ) ) {
+                    // See if movement is at least 40 pixels
+                    if ( (Math.abs(x - mInitX) >= 40) || (Math.abs(mInitY - y) >= 40 ) ) {
                         if (x > mInitX || y < mInitY) {
                             mDice[0].addOne();
                         }
@@ -107,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements RollLengthDialogF
         public boolean onDown(MotionEvent event) {
             return true;
         }
+
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             rollDice();

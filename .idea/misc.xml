@@ -3,6 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/othma/AndroidStudioProjects/Zy4DR-master/app/src/main/res/drawable/dice_1.xml" value="0.1398148148148148" />
+        <entry key="..\:/Users/othma/AndroidStudioProjects/Zy4DR-master/app/src/main/res/drawable/roll.xml" value="0.1398148148148148" />
+        <entry key="..\:/Users/othma/AndroidStudioProjects/Zy4DR-master/app/src/main/res/drawable/stop.xml" value="0.1398148148148148" />
+        <entry key="..\:/Users/othma/AndroidStudioProjects/Zy4DR-master/app/src/main/res/drawable/timer.xml" value="0.1398148148148148" />
+        <entry key="..\:/Users/othma/AndroidStudioProjects/Zy4DR-master/app/src/main/res/layout/activity_main.xml" value="0.10740740740740741" />
         <entry key="..\:/Users/othma/AndroidStudioProjects/Zy4DR-master/app/src/main/res/menu/appbar_menu.xml" value="0.176" />
         <entry key="..\:/Users/othma/AndroidStudioProjects/Zy4DR-master/app/src/main/res/menu/context_menu.xml" value="0.21770833333333334" />
         <entry key="app/src/main/res/drawable/dice_2.xml" value="0.2625" />
